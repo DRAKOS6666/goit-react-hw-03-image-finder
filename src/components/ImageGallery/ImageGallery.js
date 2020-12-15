@@ -64,26 +64,17 @@ class ImageGallery extends Component {
   };
 
   openModal = e => {
-    console.log('OpenModalEvent :>> ', typeof e.target.id);
-
     const result = this.state.images.find(image => {
       return e.target.id === image.id.toString();
     });
-    console.log('result :>> ', result);
     this.setState({
       isModal: true,
       modalItem: result,
     });
   };
 
-  closeModal = e => {
-    console.log('event :>> ', e);
-    if (e.type === 'click' && e.target.className === 'Overlay') {
-      this.setState({ isModal: false });
-    }
-    if (e.code === 'Escape') {
-      this.setState({ isModal: false });
-    }
+  closeModal = () => {
+    this.setState({ isModal: false });
   };
 
   render() {
@@ -118,7 +109,9 @@ class ImageGallery extends Component {
           )
         ) : null}
         {isModal && (
-          <Modal modalItem={modalItem} closeModal={this.closeModal} />
+          <Modal closeModal={this.closeModal}>
+            <img src={modalItem.largeImageURL} alt={modalItem.tags} />
+          </Modal>
         )}
       </>
     );
