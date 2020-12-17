@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
+import propTypes from 'prop-types';
+import { toast } from 'react-toastify';
 
 class Searchbar extends Component {
+  static propTypes = {
+    onSubmit: propTypes.func.isRequired,
+  };
+
   state = { searchText: '' };
 
   handleChange = e => {
@@ -9,6 +15,17 @@ class Searchbar extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
+    if (this.state.searchText === '') {
+      toast.error('Please enter search query!', {
+        position: 'top-right',
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
     this.props.onSubmit(this.state.searchText);
     this.setState({ searchText: '' });
   };
@@ -22,7 +39,7 @@ class Searchbar extends Component {
           </button>
 
           <input
-            value={this.state.query}
+            value={this.state.searchText}
             onChange={this.handleChange}
             className="SearchForm-input"
             type="text"

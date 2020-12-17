@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
+import propTypes from 'prop-types';
 import Loader from 'react-loader-spinner';
-import Button from '../Button/Button';
+import Button from './Button/Button';
 import Modal from '../Modal/Modal';
+import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 import fetchImage from '../../service/fetchImages';
+import { toast } from 'react-toastify';
 
+import 'react-toastify/dist/ReactToastify.css';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+import './ImageGallery.scss';
 
 class ImageGallery extends Component {
+  static propTypes = {
+    query: propTypes.string.isRequired,
+  };
+
   state = {
     images: [],
     isLoading: false,
@@ -21,28 +30,67 @@ class ImageGallery extends Component {
 
     fetchImage(query, this.state.currentPage)
       .then(res => {
-        const result = res.hits;
-        console.log('Response :>> ', res.hits);
-        this.setState(prevState => {
-          return {
-            images: [...prevState.images, ...result],
-            isLoading: false,
-          };
-        });
+        res.hits.forEach(image => console.log(image.id));
+        if (res.hits.length > 0) {
+          this.setState(prevState => {
+            return {
+              images: [...prevState.images, ...res.hits],
+              isLoading: false,
+            };
+          });
+        } else {
+          toast.warn('Nothing found, try another query', {
+            position: 'top-right',
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        }
       })
-
       .catch(err => {
+        toast.error('Error, Something went wrong, try again', {
+          position: 'top-right',
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
         console.log(err);
       });
   };
 
   componentDidMount() {
-    if (this.props.query) {
+    this.setState({ isLoading: false });
+    if (this.props.query !== '') {
       this.getImages();
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.query !== prevProps.query) {
+      this.setState({ images: [], currentPage: 1 });
+      this.getImages();
+    }
+    if (this.state.currentPage > prevState.currentPage) {
+      this.getImages();
+    }
+
+    if (this.state.images.length > prevState.images.length) {
+      toast.success('Success!', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
     window.scrollTo({
       top: document.documentElement.scrollHeight,
       behavior: 'smooth',
@@ -50,22 +98,14 @@ class ImageGallery extends Component {
   }
 
   loadMore = () => {
-    this.setState(
-      prevState => {
-        console.log('prevState :>> ', prevState);
-        console.log('currentPageLoadMore >> ', this.state.currentPage);
-        console.log('currentPrevPageLoadMore >> ', prevState.currentPage);
-        return { currentPage: prevState.currentPage + 1 };
-      },
-      () => {
-        this.getImages();
-      },
-    );
+    this.setState(prevState => {
+      return { currentPage: prevState.currentPage + 1 };
+    });
   };
 
-  openModal = e => {
+  openModal = imgId => {
     const result = this.state.images.find(image => {
-      return e.target.id === image.id.toString();
+      return image.id === imgId;
     });
     this.setState({
       isModal: true,
@@ -84,29 +124,28 @@ class ImageGallery extends Component {
         {images.length > 0 && (
           <ul className="ImageGallery">
             {images.map(item => (
-              <li key={item.id} className="ImageGalleryItem">
-                <img
-                  id={item.id}
-                  onClick={this.openModal}
-                  className="ImageGalleryItem-image"
-                  src={item.webformatURL}
-                />
-              </li>
+              <ImageGalleryItem
+                key={item.id}
+                item={item}
+                openModal={this.openModal}
+              />
             ))}
           </ul>
         )}
         {images.length > 0 ? (
-          isLoading ? (
-            <Loader
-              type="TailSpin"
-              color="#00BFFF"
-              height={40}
-              width={40}
-              timeout={3000}
-            />
-          ) : (
-            <Button loadMore={this.loadMore} />
-          )
+          <div className="loadMoreContainer">
+            {isLoading ? (
+              <Loader
+                type="TailSpin"
+                color="#00BFFF"
+                height={40}
+                width={40}
+                timeout={4000}
+              />
+            ) : (
+              <Button loadMore={this.loadMore} />
+            )}
+          </div>
         ) : null}
         {isModal && (
           <Modal closeModal={this.closeModal}>
