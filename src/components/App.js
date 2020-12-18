@@ -16,12 +16,10 @@ class App extends Component {
     const { query } = this.state;
     return (
       <>
-      <ErrorBoundary>
-        <Searchbar onSubmit={this.setQuery} />
-      </ErrorBoundary>
-      <ErrorBoundary>
-        {query && <ImageGallery query={query} />}
-      </ErrorBoundary>
+        <ErrorBoundary>
+          <Searchbar onSubmit={this.setQuery} />
+          {query && <ImageGallery query={query} />}
+        </ErrorBoundary>
       </>
     );
   }
