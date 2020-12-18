@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
+import ErrorBoundary from './ErrorBoundary/ErrorBoundary';
 
 class App extends Component {
   state = {
@@ -15,8 +16,12 @@ class App extends Component {
     const { query } = this.state;
     return (
       <>
+      <ErrorBoundary>
         <Searchbar onSubmit={this.setQuery} />
+      </ErrorBoundary>
+      <ErrorBoundary>
         {query && <ImageGallery query={query} />}
+      </ErrorBoundary>
       </>
     );
   }
