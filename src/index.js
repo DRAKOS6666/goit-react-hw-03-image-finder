@@ -9,6 +9,7 @@ import './index.scss';
 
 ReactDOM.render(
   <React.StrictMode>
+    <App className="App" />
     <ToastContainer
       position="bottom-center"
       autoClose={4000}
@@ -20,8 +21,6 @@ ReactDOM.render(
       draggable
       pauseOnHover
     />
-    <App className="App" />
-    <ToastContainer />
   </React.StrictMode>,
   document.getElementById('root'),
 );

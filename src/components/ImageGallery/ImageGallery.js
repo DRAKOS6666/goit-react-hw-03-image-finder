@@ -30,7 +30,6 @@ class ImageGallery extends Component {
 
     fetchImage(query, this.state.currentPage)
       .then(res => {
-        res.hits.forEach(image => console.log(image.id));
         if (res.hits.length > 0) {
           this.setState(prevState => {
             return {
