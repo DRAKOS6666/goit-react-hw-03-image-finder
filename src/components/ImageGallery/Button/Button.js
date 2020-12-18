@@ -1,9 +1,17 @@
 import React from 'react';
+import propTypes from 'prop-types';
 
-export default function Button({ loadMore }) {
+ function Button({ loadMore }) {
   return (
-    <button onClick={loadMore} className="Button">
+    <button type="button" onClick={loadMore} className="Button">
       Load More
     </button>
   );
 }
+
+Button.propTypes = {
+  loadMore: propTypes.func.isRequired
+}
+
+
+export default Button;
