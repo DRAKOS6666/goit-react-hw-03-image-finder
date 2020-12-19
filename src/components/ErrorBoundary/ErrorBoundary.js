@@ -5,9 +5,6 @@ export default class ErrorBoundary extends Component {
     super(props);
     this.state = { isError: false };
   }
-  //   state = {
-  //   isError: false,
-  // };
 
   componentDidCatch(error, info) {
     console.log('Got You!');
