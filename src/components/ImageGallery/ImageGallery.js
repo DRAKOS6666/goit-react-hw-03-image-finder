@@ -24,19 +24,50 @@ class ImageGallery extends Component {
     modalItem: null,
   };
 
+  componentDidMount() {
+    // this.setState({ isLoading: false });
+    if (this.props.query !== '') {
+      this.getImages();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.query !== prevProps.query) {
+      this.setState({ images: [], currentPage: 1 });
+      // this.getImages();
+    }
+    if (this.state.currentPage !== prevState.currentPage) {
+      this.getImages();
+    }
+
+    if (this.state.images.length > prevState.images.length) {
+      toast.success('Success!', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth',
+    });
+  }
+
   getImages = () => {
     const query = this.props.query;
     this.setState({ isLoading: true });
 
     fetchImage(query, this.state.currentPage)
       .then(res => {
+        console.log('res :>> ', res);
         if (res.hits.length > 0) {
-          this.setState(prevState => {
-            return {
-              images: [...prevState.images, ...res.hits],
-              isLoading: false,
-            };
-          });
+          this.setState(prevState => ({
+            images: [...prevState.images, ...res.hits],
+          }));
         } else {
           toast.warn('Nothing found, try another query', {
             position: 'top-right',
@@ -60,41 +91,9 @@ class ImageGallery extends Component {
           progress: undefined,
         });
         console.log(err);
-      });
+      })
+      .finally(this.setState({ isLoading: false }));
   };
-
-  componentDidMount() {
-    this.setState({ isLoading: false });
-    if (this.props.query !== '') {
-      this.getImages();
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.query !== prevProps.query) {
-      this.setState({ images: [], currentPage: 1 });
-      this.getImages();
-    }
-    if (this.state.currentPage > prevState.currentPage) {
-      this.getImages();
-    }
-
-    if (this.state.images.length > prevState.images.length) {
-      toast.success('Success!', {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
-  }
 
   loadMore = () => {
     this.setState(prevState => {
