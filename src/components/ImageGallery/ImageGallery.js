@@ -64,12 +64,9 @@ class ImageGallery extends Component {
     fetchImage(query, this.state.currentPage)
       .then(res => {
         if (res.hits.length > 0) {
-          this.setState(prevState => {
-            return {
-              images: [...prevState.images, ...res.hits],
-              isLoading: false,
-            };
-          });
+          this.setState(prevState => ({
+            images: [...prevState.images, ...res.hits],
+          }));
         } else {
           toast.warn('Nothing found, try another query', {
             position: 'top-right',
@@ -94,7 +91,8 @@ class ImageGallery extends Component {
         });
         this.setState({ isLoading: false });
         console.log(err);
-      });
+      })
+      .finally(this.setState({ isLoading: false }));
   };
 
   loadMore = () => {

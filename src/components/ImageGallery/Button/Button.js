@@ -1,7 +1,7 @@
 import React from 'react';
 import propTypes from 'prop-types';
 
- function Button({ loadMore }) {
+function Button({ loadMore }) {
   return (
     <button type="button" onClick={loadMore} className="Button">
       Load More
@@ -10,8 +10,7 @@ import propTypes from 'prop-types';
 }
 
 Button.propTypes = {
-  loadMore: propTypes.func.isRequired
-}
-
+  loadMore: propTypes.func.isRequired,
+};
 
 export default Button;

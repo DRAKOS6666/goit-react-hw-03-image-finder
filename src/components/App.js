@@ -15,14 +15,10 @@ class App extends Component {
   render() {
     const { query } = this.state;
     return (
-      <>
       <ErrorBoundary>
         <Searchbar onSubmit={this.setQuery} />
-      </ErrorBoundary>
-      <ErrorBoundary>
         {query && <ImageGallery query={query} />}
       </ErrorBoundary>
-      </>
     );
   }
 }
