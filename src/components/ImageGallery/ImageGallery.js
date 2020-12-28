@@ -24,13 +24,45 @@ class ImageGallery extends Component {
     modalItem: null,
   };
 
+  componentDidMount() {
+    // this.setState({ isLoading: false });
+    if (this.props.query !== '') {
+      this.getImages();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.query !== prevProps.query) {
+      this.setState({ images: [], currentPage: 1 });
+      // this.getImages();
+    }
+    if (this.state.currentPage !== prevState.currentPage) {
+      this.getImages();
+    }
+
+    if (this.state.images.length > prevState.images.length) {
+      toast.success('Success!', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }
+
   getImages = () => {
     const query = this.props.query;
     this.setState({ isLoading: true });
 
     fetchImage(query, this.state.currentPage)
       .then(res => {
-        res.hits.forEach(image => console.log(image.id));
         if (res.hits.length > 0) {
           this.setState(prevState => {
             return {
@@ -60,42 +92,10 @@ class ImageGallery extends Component {
           draggable: true,
           progress: undefined,
         });
+        this.setState({ isLoading: false });
         console.log(err);
       });
   };
-
-  componentDidMount() {
-    this.setState({ isLoading: false });
-    if (this.props.query !== '') {
-      this.getImages();
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.query !== prevProps.query) {
-      this.setState({ images: [], currentPage: 1 });
-      this.getImages();
-    }
-    if (this.state.currentPage > prevState.currentPage) {
-      this.getImages();
-    }
-
-    if (this.state.images.length > prevState.images.length) {
-      toast.success('Success!', {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
-  }
 
   loadMore = () => {
     this.setState(prevState => {
@@ -114,7 +114,7 @@ class ImageGallery extends Component {
   };
 
   closeModal = () => {
-    this.setState({ isModal: false });
+    this.setState({ isModal: false, modalItem: null });
   };
 
   render() {
@@ -122,31 +122,33 @@ class ImageGallery extends Component {
     return (
       <>
         {images.length > 0 && (
-          <ul className="ImageGallery">
-            {images.map(item => (
-              <ImageGalleryItem
-                key={item.id}
-                item={item}
-                openModal={this.openModal}
-              />
-            ))}
-          </ul>
+          <>
+            <ul className="ImageGallery">
+              {images.map(item => (
+                <ImageGalleryItem
+                  key={item.id}
+                  item={item}
+                  openModal={this.openModal}
+                />
+              ))}
+            </ul>
+            <div className="loadMoreContainer">
+              {isLoading ? (
+                <Loader
+                  type="TailSpin"
+                  color="#00BFFF"
+                  height={40}
+                  width={40}
+                  timeout={4000}
+                />
+              ) : (
+                <Button loadMore={this.loadMore} />
+              )}
+            </div>
+          </>
         )}
-        {images.length > 0 ? (
-          <div className="loadMoreContainer">
-            {isLoading ? (
-              <Loader
-                type="TailSpin"
-                color="#00BFFF"
-                height={40}
-                width={40}
-                timeout={4000}
-              />
-            ) : (
-              <Button loadMore={this.loadMore} />
-            )}
-          </div>
-        ) : null}
+        {/* {images.length > 0 ? (
+          ) : null} */}
         {isModal && (
           <Modal closeModal={this.closeModal}>
             <img src={modalItem.largeImageURL} alt={modalItem.tags} />

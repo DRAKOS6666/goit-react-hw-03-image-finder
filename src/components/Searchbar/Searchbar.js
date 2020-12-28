@@ -25,6 +25,7 @@ class Searchbar extends Component {
         draggable: true,
         progress: undefined,
       });
+      return;
     }
     this.props.onSubmit(this.state.searchText);
     this.setState({ searchText: '' });
