@@ -27,16 +27,34 @@ class ImageGallery extends Component {
   componentDidMount() {
     // this.setState({ isLoading: false });
     if (this.props.query !== '') {
-      this.getImages();
+      console.log('CDMount lets do fetch');
+      return this.getImages();
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log('START UPDATE ======================================');
+    console.log(
+      'CDU prevQuery: ' +
+        prevProps.query +
+        ' currentQuery: ' +
+        this.props.query,
+    );
+    console.log(
+      'CDU prevPage: ' +
+        prevState.currentPage +
+        ' currentPage: ' +
+        this.state.currentPage,
+    );
     if (this.props.query !== prevProps.query) {
-      this.setState({ images: [], currentPage: 1 });
-      // this.getImages();
+      console.log('New query fetch');
+      this.setState({ images: [], currentPage: 1 }, this.getImages());
     }
-    if (this.state.currentPage !== prevState.currentPage) {
+    if (
+      this.state.currentPage > prevState.currentPage &&
+      this.props.query === prevProps.query
+    ) {
+      console.log('Fetch same query');
       this.getImages();
     }
 
@@ -63,10 +81,13 @@ class ImageGallery extends Component {
 
     fetchImage(query, this.state.currentPage)
       .then(res => {
+        console.log('RESPONSE', res);
         if (res.hits.length > 0) {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...res.hits],
-          }));
+          this.setState(prevState => {
+            console.table('currentState', this.state);
+            console.table('prevState: ', prevState);
+            return { images: [...prevState.images, ...res.hits] };
+          });
         } else {
           toast.warn('Nothing found, try another query', {
             position: 'top-right',
@@ -89,7 +110,6 @@ class ImageGallery extends Component {
           draggable: true,
           progress: undefined,
         });
-        this.setState({ isLoading: false });
         console.log(err);
       })
       .finally(this.setState({ isLoading: false }));
