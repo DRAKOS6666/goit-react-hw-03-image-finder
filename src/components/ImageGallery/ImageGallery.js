@@ -33,29 +33,29 @@ class ImageGallery extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('START UPDATE ======================================');
-    console.log(
-      'CDU prevQuery: ' +
-        prevProps.query +
-        ' currentQuery: ' +
-        this.props.query,
-    );
-    console.log(
-      'CDU prevPage: ' +
-        prevState.currentPage +
-        ' currentPage: ' +
-        this.state.currentPage,
-    );
-    if (this.props.query !== prevProps.query) {
-      console.log('New query fetch');
-      this.setState({ images: [], currentPage: 1 }, this.getImages());
-    }
+    // console.log('START UPDATE ======================================');
+    // console.log(
+    //   'CDU prevQuery: ' +
+    //     prevProps.query +
+    //     ' currentQuery: ' +
+    //     this.props.query,
+    // );
+    // console.log(
+    //   'CDU prevPage: ' +
+    //     prevState.currentPage +
+    //     ' currentPage: ' +
+    //     this.state.currentPage,
+    // );
     if (
-      this.state.currentPage > prevState.currentPage &&
+      this.state.currentPage !== prevState.currentPage &&
       this.props.query === prevProps.query
     ) {
       console.log('Fetch same query');
       this.getImages();
+    }
+    if (this.props.query !== prevProps.query) {
+      console.log('New query fetch');
+      this.setState({ images: [], currentPage: 1 }, this.getImages());
     }
 
     if (this.state.images.length > prevState.images.length) {
@@ -84,8 +84,6 @@ class ImageGallery extends Component {
         console.log('RESPONSE', res);
         if (res.hits.length > 0) {
           this.setState(prevState => {
-            console.table('currentState', this.state);
-            console.table('prevState: ', prevState);
             return { images: [...prevState.images, ...res.hits] };
           });
         } else {
