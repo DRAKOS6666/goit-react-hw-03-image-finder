@@ -25,37 +25,23 @@ class ImageGallery extends Component {
   };
 
   componentDidMount() {
-    // this.setState({ isLoading: false });
     if (this.props.query !== '') {
-      console.log('CDMount lets do fetch');
       return this.getImages();
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log('START UPDATE ======================================');
-    // console.log(
-    //   'CDU prevQuery: ' +
-    //     prevProps.query +
-    //     ' currentQuery: ' +
-    //     this.props.query,
-    // );
-    // console.log(
-    //   'CDU prevPage: ' +
-    //     prevState.currentPage +
-    //     ' currentPage: ' +
-    //     this.state.currentPage,
-    // );
     if (
       this.state.currentPage !== prevState.currentPage &&
-      this.props.query === prevProps.query
+      this.state.currentPage !== 1
     ) {
-      console.log('Fetch same query');
       this.getImages();
     }
     if (this.props.query !== prevProps.query) {
-      console.log('New query fetch');
-      this.setState({ images: [], currentPage: 1 }, this.getImages());
+      this.setState(
+        { images: [], currentPage: 1, isLoading: false },
+        this.getImages(),
+      );
     }
 
     if (this.state.images.length > prevState.images.length) {
@@ -81,10 +67,12 @@ class ImageGallery extends Component {
 
     fetchImage(query, this.state.currentPage)
       .then(res => {
-        console.log('RESPONSE', res);
         if (res.hits.length > 0) {
           this.setState(prevState => {
-            return { images: [...prevState.images, ...res.hits] };
+            return {
+              images: [...prevState.images, ...res.hits],
+              isLoading: false,
+            };
           });
         } else {
           toast.warn('Nothing found, try another query', {
@@ -109,8 +97,7 @@ class ImageGallery extends Component {
           progress: undefined,
         });
         console.log(err);
-      })
-      .finally(this.setState({ isLoading: false }));
+      });
   };
 
   loadMore = () => {
@@ -163,8 +150,6 @@ class ImageGallery extends Component {
             </div>
           </>
         )}
-        {/* {images.length > 0 ? (
-          ) : null} */}
         {isModal && (
           <Modal closeModal={this.closeModal}>
             <img src={modalItem.largeImageURL} alt={modalItem.tags} />
