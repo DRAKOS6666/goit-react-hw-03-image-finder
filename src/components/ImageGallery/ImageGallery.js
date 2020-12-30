@@ -32,11 +32,9 @@ class ImageGallery extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.query !== prevProps.query) {
-      console.log('NewQuery');
       this.setState({ images: [], currentPage: 1, isLoading: false }, () =>
         this.getImages(),
       );
-      console.log('cPage: ', this.state.currentPage);
     }
     if (
       this.state.currentPage !== prevState.currentPage &&
@@ -64,7 +62,6 @@ class ImageGallery extends Component {
   getImages = () => {
     const query = this.props.query;
     this.setState({ isLoading: true });
-    console.log('before fetch currPage ', this.state.currentPage);
     fetchImage(query, this.state.currentPage)
       .then(res => {
         if (res.hits.length > 0) {
